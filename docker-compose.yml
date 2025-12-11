@@ -1,0 +1,125 @@
+version: '3.8'
+
+services:
+  # Eureka Server
+  eureka-server:
+    build:
+      context: .
+      dockerfile: eureka-server/Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SERVER_PORT: 8081
+
+  # File API
+  file-api:
+    build:
+      context: .
+      dockerfile: file-api/Dockerfile
+    ports:
+      - "8082:8082"
+    depends_on:
+      - eureka-server
+      - minio
+      - postgres
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8081/eureka/
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ROOT_USER: my-key
+      MINIO_ROOT_PASSWORD: my-password-key
+      MINIO_BUCKET: conversions
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/conversiondb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_KAFKA_BOOTSTRAPSERVERS: kafka:9092
+
+  # PDF Converter
+  pdf-converter:
+    build:
+      context: .
+      dockerfile: pdf-converter/Dockerfile
+    depends_on:
+      - eureka-server
+      - minio
+      - kafka
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8081/eureka/
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ROOT_USER: my-key
+      MINIO_ROOT_PASSWORD: my-password-key
+      MINIO_BUCKET: conversions
+      SPRING_KAFKA_BOOTSTRAPSERVERS: kafka:9092
+
+  # Flow Manager
+  flow-manager:
+    build:
+      context: .
+      dockerfile: flow-manager/Dockerfile
+    ports:
+      - "8084:8084"
+    depends_on:
+      - eureka-server
+      - minio
+      - postgres
+      - kafka
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8081/eureka/
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ROOT_USER: my-key
+      MINIO_ROOT_PASSWORD: my-password-key
+      MINIO_BUCKET: conversions
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/conversiondb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_KAFKA_BOOTSTRAPSERVERS: kafka:9092
+
+  # MinIO
+  minio:
+    image: minio/minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: my-key
+      MINIO_ROOT_PASSWORD: my-password-key
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio-data:/data
+
+  # PostgreSQL
+  postgres:
+    image: postgres:14
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: conversiondb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  # Kafka
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.0.1
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+
+  kafka:
+    image: confluentinc/cp-kafka:7.0.1
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+volumes:
+  minio-data:
+  postgres-data:

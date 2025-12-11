@@ -1,0 +1,33 @@
+# Gradle
+.gradle/
+build/
+out/
+*.jar
+!gradle/wrapper/gradle-wrapper.jar  # ИСКЛЮЧАЕМ из игнора, этот файл НУЖНО коммитить
+gradle/wrapper/gradle-wrapper.jar   # НЕ включаем бинарный файл!
+
+# IDE
+.idea/
+*.iml
+*.ipr
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temp files
+*.tmp
+*.temp
+*.hprof
+*.heapdump
+
+# Docker
+*.dockerignore
+
+# Maven (если есть)
+target/
+.mvn/

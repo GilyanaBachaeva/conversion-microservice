@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: pdf-converter
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: spring_micro.pdf_converter.event
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8081/eureka/
+  instance:
+    prefer-ip-address: true
+
+minio:
+  endpoint: http://localhost:9000
+  root_user: my-key
+  root_password: my-password-key
+  bucket: conversions
+
+logging:
+  level:
+    root: INFO
+    spring_micro: DEBUG
+
+server:
+  port: 8083
