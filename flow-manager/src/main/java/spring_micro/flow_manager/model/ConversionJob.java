@@ -1,12 +1,6 @@
-package fileconverter.flowmanager.model;
+package spring_micro.flow_manager.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.GenericGenerator;
-
+import lombok.*;
 import javax.persistence.*;
 import java.time.Instant;
 import java.util.UUID;
@@ -20,8 +14,6 @@ import java.util.UUID;
 public class ConversionJob {
 
     @Id
-    @GeneratedValue(generator = "uuid2")
-    @GenericGenerator(name = "uuid2", strategy = "uuid2")
     private UUID id;
 
     private String originalFileName;
@@ -31,6 +23,11 @@ public class ConversionJob {
     @Enumerated(EnumType.STRING)
     private ConversionStatus status;
 
-    @CreationTimestamp
     private Instant createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = createdAt == null ? Instant.now() : createdAt;
+        id = id == null ? UUID.randomUUID() : id;
+    }
 }
