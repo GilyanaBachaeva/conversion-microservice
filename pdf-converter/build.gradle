@@ -36,5 +36,5 @@ dependencyManagement {
 }
 
 tasks.named("bootJar") {
-    mainClass = "spring_micro.pdf_converter.PdfConverterApplication"
+    mainClass = "fileconverter.pdfconverter.PdfConverterApplication"
 }

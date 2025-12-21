@@ -33,5 +33,5 @@ dependencyManagement {
 }
 
 tasks.bootJar {
-    mainClass.set("spring_micro.eureka_server.EurekaServerApplication")
+    mainClass.set("fileconverter.eurekaserver.EurekaServerApplication")
 }
