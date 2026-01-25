@@ -1,5 +1,6 @@
 package fileconverter.flowmanager.service;
 
+import fileconverter.flowmanager.dto.SubscriptionDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,7 +29,7 @@ public class FileUploadService {
     @Value("${minio.bucket}")
     private String bucket;
 
-    public String saveFileAndPublish(MultipartFile file) {
+    public String saveFileAndPublish(MultipartFile file, String userLogin, SubscriptionDto subscription) {
         if (file.isEmpty()) {
             throw new FileUploadException("File is empty");
         }

@@ -1,6 +1,6 @@
 plugins {
     java
-    id("org.springframework.boot") version "2.6.2"
+    id("org.springframework.boot") version "3.2.0"
     id("io.spring.dependency-management") version "1.1.7"
 }
 
@@ -18,7 +18,7 @@ repositories {
     mavenCentral()
 }
 
-extra["springCloudVersion"] = "2021.0.0"
+extra["springCloudVersion"] = "2023.0.0"
 
 dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-server")
